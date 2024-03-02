@@ -5,14 +5,14 @@
 namespace lu
 {
 
-	const float pi = acos(-1);
-
 	class Gra
 	{
 		int l_width;
 		int l_height;
 		std::string l_capture;
 		lu::Circle l_c;
+		lu::Rect l_rect;
+		lu::Poly l_p;
 		sf::RenderWindow l_window;
 
 	public:
@@ -27,30 +27,85 @@ namespace lu
 		{
 			l_window.create(sf::VideoMode(l_width, l_height), l_capture);
 
-			srand(time(0));
-
-			int r = 20;
-			int x = rand() % (1000 - 2 * r) + r;
-			int y = rand() % (600 - 2 * r) + r;
-			int v = rand() % 50 + 10;
-			int alfa = pi;
-			l_c.Setup(x, y, r, v, alfa);
+			l_c.Setup(200, 66, 60, 400);
+			l_rect.Setup(500, 25, 100, 40, 300);
+			l_p.Setup(800, 100, 80, 6, 100);
 		}
 
-		void TouchBorder(Circle& obj)
+		void TouchBorder(Circle& obj, float dt)
 		{
-			float x = obj.X();
 			float y = obj.Y();
 			float r = obj.R();
+			float v = obj.V();
 
-			if (x + r >= l_width || x - r <= 0)
+			if (y + v*dt + r >= l_height)
 			{
-				obj.Alfa(pi - obj.Alfa());
+				obj.Move((l_height - y - r) / v);
+				obj.ReverseSpeed();
+				obj.ChangeColor();
+				obj.Move(dt - (l_height - y - r) / v);
+			}
+			else if (y + v * dt - r <= 0)
+			{
+				obj.Move((y - r) / v);
+				obj.ReverseSpeed();
+				obj.ChangeColor();
+				obj.Move(dt - (y - r) / v);
+			}
+			else {
+				obj.Move(dt);
 			}
 
-			if (y + r >= l_height || y - r <= 0)
+		}
+
+		void TouchBorder(Rect& obj, float dt)
+		{
+			float y = obj.Y();
+			float b = obj.B();
+			float v = obj.V();
+
+			if (y + v * dt + b/2 >= l_height)
 			{
-				obj.Alfa(2 * pi - obj.Alfa());
+				obj.Move((l_height - y - b/2) / v);
+				obj.ReverseSpeed();
+				obj.ChangeColor();
+				obj.Move(dt - (l_height - y - b/2) / v);
+			}
+			else if (y + v * dt - b/2 <= 0)
+			{
+				obj.Move((y - b/2) / v);
+				obj.ReverseSpeed();
+				obj.ChangeColor();
+				obj.Move(dt - (y - b/2) / v);
+			}
+			else {
+				obj.Move(dt);
+			}
+
+		}
+
+		void TouchBorder(Poly& obj, float dt)
+		{
+			float y = obj.Y();
+			float a = obj.A();
+			float v = obj.V();
+
+			if (y + v * dt + a >= l_height)
+			{
+				obj.Move((l_height - y - a) / v);
+				obj.ReverseSpeed();
+				obj.ChangeColor();
+				obj.Move(dt - (l_height - y - a) / v);
+			}
+			else if (y + v * dt - a <= 0)
+			{
+				obj.Move((y - a) / v);
+				obj.ReverseSpeed();
+				obj.ChangeColor();
+				obj.Move(dt - (y - a) / v);
+			}
+			else {
+				obj.Move(dt);
 			}
 
 		}
@@ -58,6 +113,7 @@ namespace lu
 		void LifeCycle()
 		{
 			sf::Clock clock;
+			float time = 0;
 
 			while (l_window.isOpen())
 			{
@@ -69,20 +125,26 @@ namespace lu
 						l_window.close();
 				}
 
-				//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				//std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
 				
 				float dt = clock.getElapsedTime().asSeconds();
 				clock.restart();
+				time += dt;
 
-
-				l_c.Move(dt);
-
-				TouchBorder(l_c);
+				if (time > 3)
+				{
+					TouchBorder(l_c, dt);
+					TouchBorder(l_rect, dt);
+					TouchBorder(l_p, dt);
+				}
 
 
 				l_window.clear();
 				l_window.draw(l_c.Get());
+				l_window.draw(l_rect.Get());
+				l_window.draw(l_p.Get());
+				//sf::sleep(sf::seconds(2));
 				l_window.display();
 			}
 		}
