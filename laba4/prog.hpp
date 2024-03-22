@@ -3,6 +3,7 @@
 #include <thread>
 #include <text.hpp>
 #include <iostream>
+using namespace std;
 
 namespace lu
 {
@@ -11,8 +12,11 @@ namespace lu
 	{
 		int width;
 		int height;
-		std::string capture;
-		lu::mytext text;
+		int lenght = 1;
+		float showtime = 24.;
+		string capture;
+		string text = "Hi, bitches!";
+		sf::Text Mess;
 		sf::Font font;
 		sf::RenderWindow window;
 
@@ -26,10 +30,10 @@ namespace lu
 		void Setup()
 		{
 			window.create(sf::VideoMode(width, height), "Text");
-			mytext("Hi, bitches!");
+			Mess.setColor(sf::Color::White);
+			Mess.setFont(font);
 
 		}
-
 
 		void LifeCycle()
 		{
@@ -44,17 +48,24 @@ namespace lu
 					if (event.type == sf::Event::Closed)
 						window.close();
 				}
-				
+				Mess.setString(text.substr(0, lenght));
+				if (lenght < text.size())
+					lenght += 1;
 				float dt = clock.getElapsedTime().asSeconds();
+				if (showtime/text.size() > dt)
+				{
+					sf::Time t = sf::seconds(showtime/ text.size()-dt);
+					sf::sleep(t);
+				}
 				clock.restart();
 
-				if (!font.loadFromFile("arial.ttf"))
+				if (!font.loadFromFile("tools\\arial.ttf"))
 				{
 					std::cout << "Error while loading arial.ttf" << std::endl;
 				}
 				
 				window.clear();
-				window.draw(text);
+				window.draw(Mess);
 				window.display();
 			}
 		}
