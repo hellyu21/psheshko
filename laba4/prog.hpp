@@ -1,74 +1,109 @@
-#pragma once
-#include <string>
-#include <thread>
-#include <text.hpp>
-#include <iostream>
 using namespace std;
 
 namespace lu
 {
 
-	class Gra
-	{
-		int width;
-		int height;
-		int lenght = 1;
-		float showtime = 24.;
-		string capture;
-		string text = "Hi, bitches!";
-		sf::Text Mess;
-		sf::Font font;
-		sf::RenderWindow window;
+  class Mytext
+  {
+    int width;
+    int height;
+    float showtime;
+    string capture;
+    string text;
+    sf::Text Mess;
+    sf::Font font;
+    sf::RenderWindow window;
 
-	public:
-		Gra(int gotwidth, int gotheight)
-		{
-			width = gotwidth;
-			height = gotheight;
-		}
+  public:
+    Mytext(int gotwidth, int gotheight)
+    {
+      width = gotwidth;
+      height = gotheight;
+    }
 
-		void Setup()
-		{
-			window.create(sf::VideoMode(width, height), "Text");
-			Mess.setColor(sf::Color::White);
-			Mess.setFont(font);
+    void Setup(string gottext, float gotshowtime)
+    {
+      text = gottext;
+      showtime = gotshowtime;
+      window.create(sf::VideoMode(width, height), "Text");
+      Mess.setColor(sf::Color::White);
+      Mess.setFont(font);
 
-		}
+    }
 
-		void LifeCycle()
-		{
-			sf::Clock clock;
+    void verbAnimationText()
+    {
+      sf::Clock Clock;
+      clock_t start = clock();
 
-			while (window.isOpen())
-			{
+      int lenght = 1;
+      sf::Color colorback;
+      bool flag = 1;
+      sf::Music music;
+      music.openFromFile("applause_1.ogg");
 
-				sf::Event event;
-				while (window.pollEvent(event))
-				{
-					if (event.type == sf::Event::Closed)
-						window.close();
-				}
-				Mess.setString(text.substr(0, lenght));
-				if (lenght < text.size())
-					lenght += 1;
-				float dt = clock.getElapsedTime().asSeconds();
-				if (showtime/text.size() > dt)
-				{
-					sf::Time t = sf::seconds(showtime/ text.size()-dt);
-					sf::sleep(t);
-				}
-				clock.restart();
+      bool first_sleep = 1;
+      while (window.isOpen())
+      {
 
-				if (!font.loadFromFile("tools\\arial.ttf"))
-				{
-					std::cout << "Error while loading arial.ttf" << std::endl;
-				}
-				
-				window.clear();
-				window.draw(Mess);
-				window.display();
-			}
-		}
-	};
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+          if (event.type == sf::Event::Closed)
+            window.close();
+        }
 
-}
+        if (lenght < (text.size()+1) && lenght < 10)
+        {
+          Mess.setString(text.substr(0, lenght));
+
+        }
+        float dt = Clock.getElapsedTime().asSeconds();
+
+        if (first_sleep)
+        {
+          first_sleep = 0;
+        }
+        else if (showtime / text.size() > dt)
+        {
+          std::cout << "Проверка #1" << std::endl;
+          sf::Time t = sf::seconds(showtime / (text.size()-1) - dt);
+          sf::sleep(t);
+        }
+
+        clock_t end = clock();
+        cout << end - start << endl;
+        Clock.restart();
+
+        if (!font.loadFromFile("DuskDemon.ttf"))
+        {
+          std::cout << "Error while loading arial.ttf" << std::endl;
+        }
+        if (lenght < (text.size()+1) && lenght < 10)
+        {
+          cout << "Проверка #1" << endl;
+          sf::Color colortext(rand() % 256, rand() % 256, rand() % 256);
+          Mess.setColor(colortext);
+          colorback.r = rand() % 256;
+          colorback.g = rand() % 256;
+          colorback.b = rand() % 256;
+          window.clear(colorback);
+          lenght += 1;
+          if (lenght == (text.size() + 1))
+          {
+            cout << "hhhh";
+            music.play();
+            flag = 0;
+          }
+
+        }
+
+        window.clear(colorback);
+
+        window.draw(Mess);
+        window.display();
+      }
+    }
+  };
+
+}  
