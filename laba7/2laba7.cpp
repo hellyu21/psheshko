@@ -1,11 +1,11 @@
-﻿#include <iostream>
+#include <iostream>
 using namespace std;
 
 
 template<typename t>
 class Matrix {
 public:
-	t **mas;
+	t** mas;
 	int n;
 	int m;
 
@@ -16,7 +16,7 @@ public:
 	~Matrix() = default;
 
 	//полного заполнения
-	Matrix(int gn, int gm, t *gmas)
+	Matrix(int gn, int gm, t* gmas)
 	{
 		n = gn;
 		m = gm;
@@ -60,8 +60,8 @@ public:
 	friend istream& operator>>(istream& is, Matrix& mat) {
 		int gn, gm;
 		is >> gn >> gm;
-		t *mass = new t[gn*gm]{};
-		for (int i = 0; i < gn*gm; i++) {
+		t* mass = new t[gn * gm]{};
+		for (int i = 0; i < gn * gm; i++) {
 			is >> mass[i];
 		}
 
@@ -81,22 +81,13 @@ public:
 
 	//операторы +=....
 	Matrix operator+(const Matrix& smat) {
-		
-		if ((n == smat.n) && (m == smat.m)) {
-			t *mass = new t[n*m]{ 0 };
-			Matrix rmat(n, m , mass);
-			for (int i = 0; i < n; i++)
-				for (int j = 0; j < m; j++) {
-					rmat.mas[i][j] = mas[i][j] + smat.mas[i][j];
-				}
-			return rmat;
-		}
-		else {
-			int *mas = new int[1]{ 9999 };
-			Matrix rmat(1, 1, mas);
-			cout << "Error" << endl;
-			return rmat;
-		}
+		t* mass = new t[n * m]{ 0 };
+		Matrix rmat(n, m, mass);
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++) {
+				rmat.mas[i][j] = mas[i][j] + smat.mas[i][j];
+			}
+		return rmat;
 	}
 
 	Matrix operator+=(const Matrix& smat) {
@@ -107,21 +98,13 @@ public:
 
 	Matrix operator-(const Matrix& smat) {
 
-		if ((n == smat.n) && (m == smat.m)) {
-			t *mass = new t[n * m]{ 0 };
-			Matrix rmat(n, m, mass);
-			for (int i = 0; i < n; i++)
-				for (int j = 0; j < m; j++) {
-					rmat.mas[i][j] = mas[i][j] - smat.mas[i][j];
-				}
-			return rmat;
-		}
-		else {
-			int *mas = new int[1] { 9999 };
-			Matrix rmat(1, 1, mas);
-			cout << "Error" << endl;
-			return rmat;
-		}
+		t* mass = new t[n * m]{ 0 };
+		Matrix rmat(n, m, mass);
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++) {
+				rmat.mas[i][j] = mas[i][j] - smat.mas[i][j];
+			}
+		return rmat;
 	}
 
 	Matrix operator-=(const Matrix& smat) {
@@ -133,27 +116,27 @@ public:
 
 	Matrix operator*(const Matrix& smat) {
 		if (m == smat.n) {
-			t *tmp = new t[n * smat.m]{ 0 };
+			t* tmp = new t[n * smat.m]{ 0 };
 			for (int i = 0; i < n; i++)
 				for (int j = 0; j < smat.m; j++) {
 					for (int z = 0; z < m; z++) {
 						tmp[smat.m * i + j] += mas[i][z] * smat.mas[z][j];
 					}
 				}
-			Matrix rmat(n, smat.m, tmp);		
+			Matrix rmat(n, smat.m, tmp);
 			return rmat;
 		}
 		else {
-			int *u = new int[1]{ 9999 };
+			int* u = new int[1] { 9999 };
 			Matrix rmat(1, 1, u);
-			cout << "Error" << endl;		
+			cout << "Error" << endl;
 			return rmat;
 		}
 	}
 
 	Matrix operator*=(const Matrix& smat) {
 		Matrix rmat = *this * smat;
-		*this = rmat;		
+		*this = rmat;
 		return *this;
 	}
 
@@ -188,19 +171,20 @@ public:
 	}
 
 	//удаление строки
-	Matrix del(int k) {
+	void del(int k) {
 		if ((k >= 0) && (k <= n - 1)) {
-			t *newmas = new t [(n - 1)*m] {0};
-			Matrix nmat(n - 1, m, newmas);
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < m; j++) {
 					if (i < k)
-						nmat.mas[i][j] = mas[i][j];
+						mas[i][j] = mas[i][j];
 					else if (i > k)
-						nmat.mas[i - 1][j] = mas[i][j];
+						mas[i - 1][j] = mas[i][j];
+				}
+				if (i == n - 1) {
+					n = n - 1;
+					delete[] mas[i];
 				}
 			}
-			return nmat;
 		}
 	}
 };
@@ -230,6 +214,16 @@ int main()
 	cout << F << endl;
 	int Z = B.det();
 	cout << Z << endl;
-	A = A.del(1);
+	A.del(1);
 	cout << A << endl;
+
+	Matrix<double> dob;
+	cin >> dob;
+	dob++;
+	cout << dob;
+
+	bool fo[6] = { 0, 1, 1, 0, 0, 1 };
+	Matrix<bool> bo(2, 3, fo);
+	bo ++;
+	cout << bo;
 }
